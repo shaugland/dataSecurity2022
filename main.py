@@ -35,11 +35,12 @@ def findEncryptValue(text, encrypt=True):
     return text 
 
 def encryptText(plaintext):
-    ciphertext, tag = cipher.encrypt_and_digest(bytes(plaintext, 'utf-8'))
+    ciphertext = cipher.encrypt(bytes(plaintext, 'utf-8'))
     return b64encode(ciphertext).decode( 'utf-8' )
 
 def decryptText(ciphertext):
-    data = cipher.decrypt_and_verify(ciphertext, tag)
+    cipher = AES.new(key, AES.MODE_EAX)
+    data = cipher.decrypt(bytes(ciphertext, 'utf-8'))
     return data.decode('UTF-8')
 
 
