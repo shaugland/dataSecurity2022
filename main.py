@@ -104,7 +104,7 @@ def search():
             for col in result:
                 row += ' | ' + findEncryptValue(str(col), False) + ' | '
 
-        print(row)
+            print(row)
     else:
         colQuery = input('What column would you like to search?: ')
         searchQuery = input('What value would you like to search (encrypted values will not be searched): ')
@@ -156,18 +156,20 @@ def updateRow():
 
     id = input("Please give the id to the row you want to update: ")
 
-    for column in getColumns(selectedTable):
+    for column in getColumns(table):
         print(column)
 
     selectedColumn = input('What column do you want to modify?: ')
 
     res = conn.execute(f"SELECT {selectedColumn} FROM {table} where ID = {id};")
-    prevValue = findEncryptValue(res.fetchall()[0], False)
+    prevValue = findEncryptValue(res.fetchall()[0][0], False)
 
     print("Previous value is: " + prevValue)
     newValue = input('What is your new value: ')
 
-    conn.execute(f"UPDATE {table} SET {column} = {findEncryptValue(newValue)}")
+    updatedValue = findEncryptValue(newValue)
+
+    conn.execute(f"UPDATE {table} SET {selectedColumn}='{updatedValue}' WHERE ID={id};")
     conn.commit()
     print('Value successfully updated')
 
@@ -194,15 +196,17 @@ def main():
 
         if (customerPick == '1'):
             search()
-        if (customerPick == '2'):
+        elif (customerPick == '2'):
             createRow()
-        if (customerPick == '3'):
+        elif (customerPick == '3'):
             updateRow()
-        if (customerPick == 'q'):
+        elif (customerPick == '4'):
+            deleteRow()
+        elif (customerPick == 'q'):
             return
-    
-test = findEncryptValue("something e(dfskadfkl)d")
-print(test)
+        else:
+            print("Please try again")
 
+    
 main()
 conn.close()
