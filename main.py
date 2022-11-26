@@ -1,4 +1,4 @@
-from Crypto.Cipher import AES
+from Crypto.Cipher import AES # pycryptodome library
 from Crypto import Random
 import base64
 import sqlite3
@@ -45,8 +45,8 @@ def findEncryptValue(text, encrypt=True):
 
 def encryptText(plaintext):
     cipher = AES.new(key, AES.MODE_CBC, iv)
-    plaintext = pad(plaintext)
-    return base64.b64encode(cipher.encrypt(plaintext)).decode()
+    paddedText = pad(plaintext)
+    return base64.b64encode(cipher.encrypt(paddedText)).decode()
 
 def decryptText(ciphertext):
     cipher = AES.new(key, AES.MODE_CBC, iv)
@@ -151,6 +151,35 @@ def createRow():
     conn.commit()
     print("Records successfully inserted")
 
+def updateRow():
+    table = getTable()
+
+    id = input("Please give the id to the row you want to update: ")
+
+    for column in getColumns(selectedTable):
+        print(column)
+
+    selectedColumn = input('What column do you want to modify?: ')
+
+    res = conn.execute(f"SELECT {selectedColumn} FROM {table} where ID = {id};")
+    prevValue = findEncryptValue(res.fetchall()[0], False)
+
+    print("Previous value is: " + prevValue)
+    newValue = input('What is your new value: ')
+
+    conn.execute(f"UPDATE {table} SET {column} = {findEncryptValue(newValue)}")
+    conn.commit()
+    print('Value successfully updated')
+
+def deleteRow():
+    table = getTable()
+
+    id = input("Please give the id to the row you want to delete: ")
+
+    conn.execute(f"DELETE from {table} where ID = {id}")
+    conn.commit()
+    
+    print("successfully deleted row")
 
 def main():
     while True:
@@ -158,6 +187,7 @@ def main():
         print('1: search database')
         print('2: create row in database')
         print('3: update row in database')
+        print('4: delete row in database')
         print("Press 'q' to quit!")
 
         customerPick = input()
@@ -166,10 +196,13 @@ def main():
             search()
         if (customerPick == '2'):
             createRow()
+        if (customerPick == '3'):
+            updateRow()
         if (customerPick == 'q'):
             return
     
-        
+test = findEncryptValue("something e(dfskadfkl)d")
+print(test)
 
 main()
 conn.close()
